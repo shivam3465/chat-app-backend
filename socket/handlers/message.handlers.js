@@ -14,11 +14,21 @@ const handleMessageSentByUser = asyncErrorLogger(async (userObj, data) => {
 
 	const { messageContent, conversationId, members, _id } = data;
 
+	const senderSocketId = getSocketId(userId);
+
 	if (!messageContent || !conversationId || !members || !_id) {
 		console.log("all fields not provided ", data);
 		return;
 	}
 	const conversation = await Conversation.findById(conversationId);
+
+	//user is now not authorized to send message(if they both were earlier friend but not now or user was part of group but now he has left);
+	if (!conversation.isConversationActive) {
+		return io.to(senderSocketId).emit(MESSAGE_EVENTS.MESSAGE_FAILED, {
+			messageId: _id,
+			conversationId,
+		});
+	}
 
 	const receiversUserId = conversation.users.filter(
 		(curUserId) => curUserId.toString() !== userId
@@ -68,8 +78,6 @@ const handleMessageSentByUser = asyncErrorLogger(async (userObj, data) => {
 		}
 	);
 
-	const senderSocketId = getSocketId(userId);
-
 	//sending message status to sender
 	io.to(senderSocketId).emit(SENDER_MESSAGE_EVENT, {
 		prevMessageId: _id,
@@ -87,8 +95,8 @@ const handleMessageHasBeenReadByReceiver = asyncErrorLogger(
 	async (userObj, data) => {
 		const { user } = userObj;
 		const { messageId, conversationId, messageOwnerId } = data;
-		
-		// console.log("----------- message has been read and received by backend --------",data);		
+
+		// console.log("----------- message has been read and received by backend --------",data);
 
 		const isFound = user.conversations.some(
 			(convoId) => convoId.toString() === conversationId.toString()

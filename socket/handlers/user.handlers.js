@@ -3,6 +3,7 @@ import { USER_EVENTS } from "../events/user.events.js";
 import { getSocketId } from "../socket.js";
 import { io } from "../../app.js";
 import { createNewConversation } from "../../utils/conversation/createNewConversation.js";
+import { Conversation } from "../../models/conversation.js";
 
 // handles event from frontend
 const handleFriendRequestSending = async (userObj, data) => {
@@ -50,8 +51,7 @@ const handleFriendRequestSending = async (userObj, data) => {
 				);
 			}
 		}
-	}
-	else console.log("User not found ",foundUser);
+	} else console.log("User not found ", foundUser);
 
 	const senderSocketId = getSocketId(userId);
 	io.to(senderSocketId).emit(
@@ -104,12 +104,27 @@ const handleAcceptFriendRequest = async (userObj, data) => {
 				invitesSent: userId,
 			});
 
-			// Optionally, create a new conversation
-			await createNewConversation(
-				[userId, receiverUserId],
-				"-",
-				true // as this is personal chat
-			);
+			const conversation = await Conversation.findOne({
+				users: { $all: [userId, receiverUserId] },
+				$expr: { $eq: [{ $size: "$users" }, 2] },
+			});
+
+			if (conversation) {
+				console.log("conversation found ", conversation);
+				// Update isConversationActive to true
+				await Conversation.updateOne(
+					{ _id: conversation._id },
+					{ $set: { isConversationActive: true } }
+				);
+			} else {
+				console.log("conversation found ", conversation);
+				// Create a new conversation
+				await createNewConversation(
+					[userId, receiverUserId],
+					"-",
+					true // as this is personal chat
+				);
+			}
 
 			// console.log("Users are now friends",user._id,receiverUser._id,user.userName,receiverUser.userName);
 

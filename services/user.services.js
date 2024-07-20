@@ -55,8 +55,8 @@ const searchUsersByUserName = async (query, currentUserData) => {
 					users: { $all: [curUser._id, currentUserData._id] },
 					isPersonalChat: true,
 				})
-				.select('lastMessageSent conversationImage')
-				.lean();
+					.select("lastMessageSent conversationImage")
+					.lean();
 
 				conversation = conversationFound ? conversationFound : null;
 			}
@@ -147,4 +147,31 @@ const processUsersDetails = async (user, next) => {
 	};
 };
 
-export { searchUsersByUserName, processUsersDetails };
+const removeUserFromFriendList = async (
+	friendId,
+	userId,
+	conversationId,
+	next
+) => {
+	const result = await User.updateOne(
+		{ _id: userId },
+		{ $pull: { friends: friendId } }
+	);
+
+	const result2 = await User.updateOne(
+		{ _id: friendId },
+		{ $pull: { friends: userId } }
+	);
+
+	const result3 = await Conversation.updateOne(
+		{ _id: conversationId },
+		{ $set: { isConversationActive: false } }
+	);
+
+	console.log(result3);
+	if (result.nModified === 0) {
+		next("No documents were updated");
+	}
+};
+
+export { searchUsersByUserName, processUsersDetails, removeUserFromFriendList };

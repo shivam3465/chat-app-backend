@@ -1,9 +1,18 @@
 import { Conversation } from "../../models/conversation.js";
 import { User } from "../../models/user.js";
 
-export const createNewConversation = async (userIds,conversationName,isPersonalChat)=>{
-    // Create the conversation
-	const newConversation = new Conversation({ users: userIds,conversationName: conversationName , isPersonalChat});
+export const createNewConversation = async (
+	userIds,
+	conversationName,
+	isPersonalChat
+) => {
+	// Create the conversation
+	const newConversation = new Conversation({
+		users: userIds,
+		conversationName: conversationName,
+		isPersonalChat,
+		isConversationActive: true,
+	});
 	await newConversation.save();
 
 	// Update users to include the new conversation
@@ -11,4 +20,4 @@ export const createNewConversation = async (userIds,conversationName,isPersonalC
 		{ _id: { $in: userIds } },
 		{ $push: { conversations: newConversation._id } }
 	);
-}
+};

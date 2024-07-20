@@ -18,6 +18,10 @@ const conversationSchema = new mongoose.Schema(
 		isPersonalChat: {
 			type: Boolean,
 			required: true
+		},
+		isConversationActive: {
+			type: Boolean,
+			default: false
 		}
 	},
 	{ timestamps: true }

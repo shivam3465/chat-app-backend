@@ -10,7 +10,7 @@ const MESSAGE_EVENTS = {
 
 	//will be sent from backend to frontend to the owner of message that message was read by receiver
 	MESSAGE_READ_BY_USER: "MESSAGE_READ_BY_USER",
-	
+
 	//message is read by the receiver , sent from frontend to backend
 	READ_MESSAGE: "READ_MESSAGE",
 
@@ -22,6 +22,9 @@ const MESSAGE_EVENTS = {
 
 	// response to the  DELETE_MESSAGE
 	MESSAGE_DELETED: "MESSAGE_DELETED",
+
+	//message not sent ,  response from our server to frontend
+	MESSAGE_FAILED: "MESSAGE_FAILED",
 };
 
 export { MESSAGE_EVENTS };

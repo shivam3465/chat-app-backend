@@ -8,6 +8,7 @@ import { asyncErrorHandler } from "../utils/errorHandler/asyncErrorHandler.js";
 import { CustomError } from "../utils/errorHandler/ErrorClass.js";
 import {
 	processUsersDetails,
+	removeUserFromFriendList,
 	searchUsersByUserName,
 } from "../services/user.services.js";
 
@@ -118,6 +119,21 @@ const searchUsers = asyncErrorHandler(async (req, res, next) => {
 	});
 });
 
+const removeFriend = asyncErrorHandler(async (req, res, next) => {
+	const { friendId, conversationId } = req.body; // match query with user name
+	await removeUserFromFriendList(
+		friendId,
+		req.user._id,
+		conversationId,
+		next
+	);
+
+	res.json({
+		success: true,
+		message: "Friend removed successfully",
+	});
+});
+
 // const addDesc = async (req, res) => {
 //   try {
 //     const { desc } = req.body;
@@ -166,4 +182,11 @@ const searchUsers = asyncErrorHandler(async (req, res, next) => {
 //   }
 // };
 
-export { login, logout, getUserDetails, registerUser, searchUsers };
+export {
+	login,
+	logout,
+	getUserDetails,
+	registerUser,
+	searchUsers,
+	removeFriend,
+};

@@ -4,6 +4,7 @@ import {
 	login,
 	logout,
 	registerUser,
+	removeFriend,
 	searchUsers,
 } from "../controllers/user.js";
 
@@ -19,6 +20,7 @@ router.route("/me").get(authenticated, getUserDetails);
 
 //
 router.route("/search").get(authenticated, searchUsers);
+router.route("/remove-friend").post(authenticated, removeFriend);
 
 // router.route("/user/add/desc").post(authenticated, addDesc);
 // router.route("/user/add/about").post(authenticated, addAbout);
