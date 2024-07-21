@@ -17,10 +17,26 @@ const getAllConversations = asyncErrorHandler(async (req, res, next) => {
 		})
 		.select("conversations");
 
+	const updatedConversation = populatedUser.conversations.map(
+		(conversation) => {
+			let newConversationName = null;
+			if (conversation.isPersonalChat) {
+				const Users = conversation.users;
+				newConversationName =
+					user.userName === Users[0].userName
+						? Users[1].userName
+						: Users[0].userName;
+			}
+			conversation.conversationName = newConversationName;
+			console.log("conversation after update ", conversation);
+			return conversation;
+		}
+	);
+
 	res.json({
 		success: true,
 		message: "Conversations found",
-		conversations: populatedUser,
+		conversations: updatedConversation,
 	});
 });
 
@@ -41,7 +57,7 @@ const addConversation = asyncErrorHandler(async (req, res, next) => {
 
 	const isPersonalChat = users.length == 2;
 
-	await createNewConversation(userIds, conversationName,isPersonalChat);
+	await createNewConversation(userIds, conversationName, isPersonalChat);
 
 	res.json({
 		success: true,
