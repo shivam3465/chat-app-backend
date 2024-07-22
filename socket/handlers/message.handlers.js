@@ -12,8 +12,8 @@ const handleMessageSentByUser = asyncErrorLogger(async (userObj, data) => {
 	// console.log("Message sent by user :  ", data);
 	const { user, userId } = userObj;
 
-	const { messageContent, conversationId, members, _id } = data;
-
+	const { messageContent, conversationId, members, _id , repliedMessage} = data;
+	
 	const senderSocketId = getSocketId(userId);
 
 	if (!messageContent || !conversationId || !members || !_id) {
@@ -59,6 +59,7 @@ const handleMessageSentByUser = asyncErrorLogger(async (userObj, data) => {
 		owner: userId,
 		conversationId,
 		status,
+		repliedMessage
 	});
 
 	//save the message in the last sent message in this conversation

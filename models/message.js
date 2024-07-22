@@ -16,6 +16,10 @@ const messageSchema = new mongoose.Schema(
 			ref: "conversation",
 		},
 		owner: { type: mongoose.SchemaTypes.ObjectId, ref: "users" },
+		repliedMessageId: {
+			type: mongoose.SchemaTypes.ObjectId,
+			ref: "messages", // Reference the same collection
+		},
 	},
 	{ timestamps: true }
 );
