@@ -12,8 +12,9 @@ const handleMessageSentByUser = asyncErrorLogger(async (userObj, data) => {
 	// console.log("Message sent by user :  ", data);
 	const { user, userId } = userObj;
 
-	const { messageContent, conversationId, members, _id , repliedMessage} = data;
-	
+	const { messageContent, conversationId, members, _id, repliedMessage } =
+		data;
+
 	const senderSocketId = getSocketId(userId);
 
 	if (!messageContent || !conversationId || !members || !_id) {
@@ -54,12 +55,12 @@ const handleMessageSentByUser = asyncErrorLogger(async (userObj, data) => {
 		status = "SENT";
 	}
 
-	const newMessage = await createNewMessage({
+	let newMessage = await createNewMessage({
 		messageContent,
 		owner: userId,
 		conversationId,
 		status,
-		repliedMessage
+		repliedMessage,
 	});
 
 	//save the message in the last sent message in this conversation
@@ -67,11 +68,13 @@ const handleMessageSentByUser = asyncErrorLogger(async (userObj, data) => {
 		lastMessageSent: newMessage._id,
 	});
 
+	const formattedMessage = { ...newMessage.toObject(), repliedMessage };
+	
 	//sending the new message to all receivers
 	io.to(...onlineReceiversSocketId).emit(
 		MESSAGE_EVENTS.NEW_MESSAGE_RECEIVED,
 		{
-			message: newMessage,
+			message: formattedMessage,
 			sender: {
 				id: userId,
 				userName: user.userName,
